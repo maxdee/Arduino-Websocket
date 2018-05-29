@@ -2,6 +2,9 @@
 
 This is a simple library that implements a Websocket client and server running on an Arduino.
 
+### This fork
+supports `webSocketServer.parsePacket()` and `webSocketServer.readBytes(uint8_t * , size_t)` much like EthernetUDP. This allows to read raw or non string data. This was done in order to receive javascript packed OSC messages. I could be neat to have full stream and print implementation.
+
 ### Getting started
 
 The example WebSocketServer.html file should be served from any web server you have access to. Remember to change the  URL in it to your Arduino. The examples are based on using a WiFly wireless card to connect. If you're using ethernet instead you'll need to swap out the client class.
