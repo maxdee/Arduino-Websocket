@@ -23,17 +23,17 @@
         		background-color: #00f;
         		width: 500px;
         		height: 30px;
-        	}        	        	
+        	}
         </style>
 
 		<script language = "javascript"type = "text/javascript">
-			var wsUri = "ws://10.1.1.33/";
+			var wsUri = "ws://192.168.2.65/";
 			var output;
-			
+
 			function init() {
 			    testWebSocket();
 			}
-			
+
 			function testWebSocket() {
 			    websocket = new WebSocket(wsUri);
 			    websocket.onopen = function(evt) {
@@ -51,10 +51,10 @@
 			    		element.style.width = evt.data.substring(2) + "px";
 			    	} else if (pin == 2) {
 			    		element = document.getElementById("greenbar");
-			    		element.style.width = evt.data.substring(2) + "px";			    		
+			    		element.style.width = evt.data.substring(2) + "px";
 			    	} else if (pin == 3) {
 			    		element = document.getElementById("bluebar");
-			    		element.style.width = evt.data.substring(2) + "px";			    		
+			    		element.style.width = evt.data.substring(2) + "px";
 			    	}
 
 			    };
@@ -62,29 +62,29 @@
 			        console.log("ERROR: " + evt.data);
 			    };
 			}
-			
+
 			function changeRed() {
 				var value = document.getElementById("red").checked;
 				var message = "d8";
-				
+
 				message += value ? "1" : "0";
-				
+
 			    console.log("SENT: " + message);
 			    websocket.send(message);
 			}
-			
+
 			function changeGreen() {
 				var value = document.getElementById("green").checked;
 				var message = "d9";
-				
+
 				message += value ? "1" : "0";
-				
+
 			    console.log("SENT: " + message);
 			    websocket.send(message);
-			}			
-			
-			
-			window.addEventListener("load", init, false); 
+			}
+
+
+			window.addEventListener("load", init, false);
         </script>
     </head>
     <body>
