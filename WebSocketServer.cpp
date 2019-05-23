@@ -263,6 +263,10 @@ String WebSocketServer::handleStream() {
     if (socket_client->connected() && socket_client->available()) {
 
         msgtype = timedRead();
+        // should be 0x8, but it seems to be 0x88
+        if(msgtype == 136) {
+            disconnectStream();
+        }
         if (!socket_client->connected()) {
             return socketString;
         }
