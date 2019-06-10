@@ -77,6 +77,8 @@ public:
     // Handle connection requests to validate and process/refuse
     // connections.
     bool handshake(Client &client);
+    bool handshakeWithHeader(Client &client, char * buffer, int length);
+
 
     // Get data off of the stream
     String getData();
@@ -102,7 +104,8 @@ private:
 
     // Discovers if the client's header is requesting an upgrade to a
     // websocket connection.
-    bool analyzeRequest(int bufferLength);
+    bool analyzeRequest(char * buffer, int length);
+    // bool analyzeRequest(int bufferLength);
 
 #ifdef SUPPORT_HIXIE_76
     String handleHixie76Stream();

@@ -12,8 +12,23 @@
 #include "Base64.h"
 
 
-bool WebSocketServer::handshake(Client &client) {
 
+bool WebSocketServer::handshake(Client &client) {
+    Client *sock = &client;
+    char buffer[512];
+    int length = 0;
+    memset(buffer, 0, sizeof(buffer));
+    if(sock->connected()){
+        length = sock->available();
+        if(length){
+            sock->readBytes(buffer, length);
+            return handshakeWithHeader(client, buffer, length);
+        }
+    }
+    return false;
+}
+
+bool WebSocketServer::handshakeWithHeader(Client &client, char * buffer, int length){
     socket_client = &client;
 
     // If there is a connected client->
@@ -22,11 +37,10 @@ bool WebSocketServer::handshake(Client &client) {
 #ifdef DEBUGGING
             Serial.println(F("Client connected"));
 #endif
-        if (analyzeRequest(BUFFER_LENGTH)) {
+        if (analyzeRequest(buffer, length)) {
 #ifdef DEBUGGING
                 Serial.println(F("Websocket established"));
 #endif
-
                 return true;
 
         } else {
@@ -43,10 +57,9 @@ bool WebSocketServer::handshake(Client &client) {
     }
 }
 
-bool WebSocketServer::analyzeRequest(int bufferLength) {
-    // Use String library to do some sort of read() magic here.
-    String temp;
 
+bool WebSocketServer::analyzeRequest(char * buffer, int length) {
+    String temp;
     int bite;
     bool foundupgrade = false;
     String oldkey[2];
@@ -58,16 +71,14 @@ bool WebSocketServer::analyzeRequest(int bufferLength) {
 #ifdef DEBUGGING
     Serial.println(F("Analyzing request headers"));
 #endif
+    for (int i = 0; i < length; i++){
+        temp += buffer[i];
+        if (buffer[i] == '\n') {
+            // Serial.print("Got Line: " + temp);
 
-    // TODO: More robust string extraction
-    while ((bite = socket_client->read()) != -1) {
-
-        temp += (char)bite;
-
-        if ((char)bite == '\n') {
-#ifdef DEBUGGING
+        #ifdef DEBUGGING
             Serial.print("Got Line: " + temp);
-#endif
+        #endif
             // TODO: Should ignore case when comparing and allow 0-n whitespace after ':'. See the spec:
             // http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html
             if (!foundupgrade && temp.startsWith("Upgrade: WebSocket")) {
@@ -90,17 +101,13 @@ bool WebSocketServer::analyzeRequest(int bufferLength) {
             }
             temp = "";
         }
-
-        if (!socket_client->available()) {
-          delay(20);
-        }
     }
 
     if (!socket_client->connected()) {
         return false;
     }
 
-    temp += 0; // Terminate string
+    // temp += 0; // Terminate string
 
     // Assert that we have all headers that are needed. If so, go ahead and
     // send response headers.
